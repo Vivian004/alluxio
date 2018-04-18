@@ -296,7 +296,7 @@ public class S3AUnderFileSystem extends ObjectUnderFileSystem {
   }
 
   @Override
-  protected boolean deleteObject(String key) throws IOException {
+  protected boolean deleteObject(String key) {
     try {
       mClient.deleteObject(mBucketName, key);
     } catch (AmazonClientException e) {
