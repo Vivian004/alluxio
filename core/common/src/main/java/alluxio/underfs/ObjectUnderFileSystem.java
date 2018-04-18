@@ -319,6 +319,7 @@ public abstract class ObjectUnderFileSystem extends BaseUnderFileSystem {
      * @throws IOException if a non-Alluxio error occurs
      */
     public void add(String path) {
+      LOG.debug("Add {}", path);
       // Delete batch size is same as listing length
       if (mCurrentBatchBuffer.size() == getListingChunkLength()) {
         // Batch is full
@@ -326,6 +327,7 @@ public abstract class ObjectUnderFileSystem extends BaseUnderFileSystem {
       }
       mCurrentBatchBuffer.add(path);
       mEntriesAdded++;
+      LOG.debug("entries added: {}", mEntriesAdded);
     }
 
     /**
@@ -340,6 +342,7 @@ public abstract class ObjectUnderFileSystem extends BaseUnderFileSystem {
       for (Future<List<String>> list : mBatchesResult) {
         try {
           result.addAll(list.get());
+          LOG.debug("result size: {}", result.size());
         } catch (InterruptedException e) {
           // If operation was interrupted do not add to successfully deleted list
           LOG.warn("Interrupted while waiting for the result of batch delete. UFS and Alluxio "
@@ -667,9 +670,11 @@ public abstract class ObjectUnderFileSystem extends BaseUnderFileSystem {
    * @return list of successfully deleted keys
    */
   protected List<String> deleteObjects(List<String> keys) throws IOException {
+    LOG.debug("deleting objects {}", keys);
     List<String> result = new ArrayList<>();
     for (String key : keys) {
       boolean status = deleteObject(key);
+      LOG.debug("delete {}: {}", key, status);
       // If key is a directory, it is possible that it was not created through Alluxio and no
       // zero-byte breadcrumb exists
       if (status || key.endsWith(getFolderSuffix())) {
@@ -678,6 +683,7 @@ public abstract class ObjectUnderFileSystem extends BaseUnderFileSystem {
         LOG.warn("Failed to delete {} from the UFS", key);
       }
     }
+    LOG.debug("result for deleting{}: {}", keys, result);
     return result;
   }
 
